@@ -2,36 +2,18 @@ import { Box, Container, Text, HStack, WrapItem } from "@chakra-ui/react";
 import { Avatar, AvatarBadge, AvatarGroup } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Navigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { axiosInstance } from "../api";
-import MyProfile from "./MyProfile"
 
 
-
-const ProfilePage = () => {
+const MyProfile = () => {
   const authSelector = useSelector((state) => state.auth);
   const params = useParams()
   const [user, setUser] = useState({});
-  const fetchUserProfile = async () => {
-    try {
-      const response = await axiosInstance.get("/users", {
-        params: {
-          username: params.username,
-        },
-      });
-      setUser(response.data[0]);
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   useEffect(() => {
     fetchUserProfile()
   }, [])
-
-  if (params.username === authSelector.username) {
-    return <Navigate to="/MyProfile" />
-  }
 
   return (
     <Container
@@ -49,26 +31,26 @@ const ProfilePage = () => {
       </Text>
       <HStack pt="8">
         <Box>
-          <Avatar size="3xl" name="Segun Adebayo" src={user.avatarUrl} />
+          <Avatar size="3xl" name="Segun Adebayo" src={authSelector.avatarUrl} />
         </Box>
         <Box pl="100">
           <Text fontSize={"2xl"} fontWeight={"semibold"}>
             Username:
           </Text>
           <br />
-          <Text fontSize={"sm"}>{user.username}</Text>
+          <Text fontSize={"sm"}>{authSelector.username}</Text>
           <br />
           <Text fontSize={"2xl"} fontWeight={"semibold"}>
             Email:
           </Text>
           <br />
-          <Text fontSize={"sm"}>{user.email}</Text>
+          <Text fontSize={"sm"}>{authSelector.email}</Text>
           <br />
           <Text fontSize={"2xl"} fontWeight={"semibold"}>
             Role:
           </Text>
           <br />
-          <Text fontSize={"sm"}>{user.role}</Text>
+          <Text fontSize={"sm"}>{authSelector.role}</Text>
           <br />
         </Box>
       </HStack>
@@ -76,4 +58,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default MyProfile;

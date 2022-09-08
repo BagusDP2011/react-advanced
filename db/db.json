@@ -5,6 +5,7 @@
       "email": "sadas@gmail.com",
       "password": "Qwerty123!",
       "role": "User",
+      "avatarUrl": "https://bit.ly/sage-adebayo",
       "id": 1
     },
     {
@@ -12,6 +13,7 @@
       "email": "robert@gmail.com",
       "password": "Qwerty123!",
       "role": "User",
+      "avatarUrl": "https://bit.ly/code-beast",
       "id": 2
     },
     {
@@ -19,6 +21,89 @@
       "email": "santo@gmail.com",
       "password": "Qwerty123!",
       "role": "User",
+      "avatarUrl": "https://bit.ly/kent-c-dodds",
+      "id": 3
+    }
+  ],
+  "posts": [
+    {
+      "body": "Hallo semuaaa",
+      "image_url": "https://images.unsplash.com/photo-1584367369853-8b966cf223f4?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTR8fGZ1bnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
+      "userId": 2,
+      "id": 1
+    },
+    {
+      "body": "Testing 1234",
+      "image_url": "https://images.unsplash.com/photo-1531012451721-432c0ae74527?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fGZ1bnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
+      "userId": 2,
+      "id": 2
+    },
+    {
+      "body": "Senangnya hatiku turun panas demamku",
+      "image_url": "https://images.unsplash.com/photo-1524293568345-75d62c3664f7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fGZ1bnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
+      "userId": 2,
+      "id": 3
+    },
+    {
+      "body": "Halo dunia",
+      "image_url": "https://images.unsplash.com/photo-1659535836241-9901856696b0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2072&q=80",
+      "userId": 2,
+      "id": 4
+    },
+    {
+      "body": "Kue ulang tahun",
+      "image_url": "https://images.unsplash.com/photo-1662441901214-013b98f0e1bf?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80",
+      "userId": 2,
+      "id": 5
+    },
+    {
+      "body": "Santuy di pantuy",
+      "image_url": "https://images.unsplash.com/photo-1662391444498-a2fe45f0812b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=652&q=80",
+      "userId": 2,
+      "id": 6
+    },
+    {
+      "body": "Jangan lupa sarapan momzz..",
+      "image_url": "https://images.unsplash.com/photo-1662469853918-c615ffb1e030?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
+      "userId": 2,
+      "id": 7
+    },
+    {
+      "body": "Senang melihat si kecil bermain dengan ayang..",
+      "image_url": "https://images.unsplash.com/photo-1657664073337-31394d7e5c7a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1036&q=80",
+      "userId": 2,
+      "id": 8
+    },
+    {
+      "body": "Mainan baru.. heheheehe..",
+      "image_url": "https://images.unsplash.com/photo-1659535948742-56813eb6f28c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80",
+      "userId": 2,
+      "id": 9
+    },
+    {
+      "body": "Robot2 an",
+      "image_url": "https://images.unsplash.com/photo-1522051311534-1f53d56b49df?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MjB8fHRleHQlMjB0byUyMHNwZWVjaHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
+      "userId": 2,
+      "id": 10
+    }
+  ],
+  "comments": [
+    {
+      "text": "",
+      "userId": 1,
+      "postId": 1,
+      "id": 1
+    },
+    {
+      "text": "Para penontonnn",
+      "userId": 1,
+      "postId": 10,
+      "id": 2
+    },
+    {
+      "text": "Bapak bapak ibu ibu yang ada disini",
+      "userId": 3,
+      "postId": 10,
       "id": 3
     }
   ]

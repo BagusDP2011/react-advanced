@@ -2,7 +2,7 @@ import { Box, Button, HStack, List, ListItem, Text } from "@chakra-ui/react"
 import { useState } from "react"
 import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { Routes, Route, Link } from "react-router-dom"
+import { Routes, Route, Link, useParams } from "react-router-dom"
 import { axiosInstance } from "./api"
 import GuestRoute from "./components/GuestRoute"
 import ProtectedRoute from "./components/ProtectedRoute"
@@ -12,32 +12,38 @@ import Dashboard2 from "./pages/admin/Dashboard2"
 import HomePage from "./pages/Home"
 import LoginPage from "./pages/Login"
 import ProfilePage from "./pages/Profile"
+import MyProfile from "./pages/MyProfile"
 import RegisterPage from "./pages/Register"
 import { login, logout } from "./redux/features/authSlice"
 
 const App = () => {
   const [authCheck, setAuthCheck] = useState(false)
-
+  const [isiUser, setUser] = useState({})
+  const params = useParams()
   const authSelector = useSelector((state) => state.auth)
   const dispatch = useDispatch()
 
   const keepUserLoggedIn = async () => {
     try {
       const auth_id = localStorage.getItem("auth_data")
-
+      
       if (!auth_id) {
+        setAuthCheck(true)
         return
       }
-
+      
       const response = await axiosInstance.get(`/users/${auth_id}`)
 
       dispatch(login(response.data))
+      setAuthCheck(true)
+
     } catch (err) {
+      setAuthCheck(true)
       console.log(err)
     }
-
-    setAuthCheck(true)
+    
   }
+
 
   const logoutBtnHandler = () => {
     localStorage.removeItem("auth_data")
@@ -61,9 +67,9 @@ const App = () => {
     keepUserLoggedIn()
   }, [])
 
-  // if (!authCheck) {
-  //   return <div>Loading...</div>
-  // }
+  if (!authCheck) {
+    return <div>Loading...</div>
+  }
 
   return (
     <Box>
@@ -96,10 +102,18 @@ const App = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route
-          path="/profile"
+          path="/profile/:username"
           element={
             <ProtectedRoute>
               <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile/MyProfile"
+          element={
+            <ProtectedRoute>
+              <MyProfile />
             </ProtectedRoute>
           }
         />
