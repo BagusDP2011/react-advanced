@@ -1,17 +1,19 @@
-import { Box, Container, Text, HStack, WrapItem } from "@chakra-ui/react";
+import { Box, Container, Text, HStack, WrapItem, useToast, Stack } from "@chakra-ui/react";
 import { Avatar, AvatarBadge, AvatarGroup } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Navigate, useParams } from "react-router-dom";
 import { axiosInstance } from "../api";
-import MyProfile from "./MyProfile"
-
-
+import Post from "../components/Post";
+import MyProfile from "./MyProfile";
 
 const ProfilePage = () => {
   const authSelector = useSelector((state) => state.auth);
-  const params = useParams()
+  const params = useParams();
   const [user, setUser] = useState({});
+  const toast = useToast()
+  const [posts, setPosts] = useState();
+
   const fetchUserProfile = async () => {
     try {
       const response = await axiosInstance.get("/users", {
@@ -25,12 +27,46 @@ const ProfilePage = () => {
     }
   };
 
+  const fetchPosts = async () => {
+    try {
+      const response = await axiosInstance.get("/posts", {
+        params: {
+          userId: user.id,
+        },
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
   useEffect(() => {
-    fetchUserProfile()
-  }, [])
+    fetchUserProfile();
+    fetchPosts();
+  }, [user.id]);
+  
+  useEffect(() => {
+    if (user.id) {
+      fetchPosts();
+    }
+  }, [user.id]);
+
+  const renderPosts = () => {
+    return posts.map((val) => {
+      return (
+        <Post
+          key={val.id.toString()}
+          username={val.user.username}
+          body={val.body}
+          imageUrl={val.image_url}
+          userId={val.userId}
+          onDelete={() => deleteBtnHandler(val.id)}
+          postId={val.id}
+        />
+      )
+    })
+  }
 
   if (params.username === authSelector.username) {
-    return <Navigate to="/MyProfile" />
+    return <Navigate to="/MyProfile" />;
   }
 
   return (
@@ -72,6 +108,7 @@ const ProfilePage = () => {
           <br />
         </Box>
       </HStack>
+      <Stack>{renderPosts}</Stack>
     </Container>
   );
 };

@@ -1,19 +1,91 @@
-import { Box, Container, Text, HStack, WrapItem } from "@chakra-ui/react";
+import {
+  Box,
+  Container,
+  Text,
+  HStack,
+  WrapItem,
+  Stack,
+  FormControl,
+  FormLabel,
+  Input,
+  Button,
+  useToast,
+} from "@chakra-ui/react";
 import { Avatar, AvatarBadge, AvatarGroup } from "@chakra-ui/react";
+import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { axiosInstance } from "../api";
-
+import * as Yup from "yup";
 
 const MyProfile = () => {
   const authSelector = useSelector((state) => state.auth);
+  const [openStatus, setOpenStatus] = useState(false);
   const params = useParams()
-  const [user, setUser] = useState({});
+  const [editMode, setEditMode] = useState(false)
+  const [posts, setPosts] = useState()
+  const toast = useToast()
 
-  useEffect(() => {
-    fetchUserProfile()
-  }, [])
+
+  const openStatusBtnHandler = () => {
+    openStatus = !openStatus;
+  };
+
+  const formik = useFormik({
+    initialValues: {
+      username: authSelector.username,
+      email: authSelector.email,
+      avatarUrl: authSelector.avatarUrl,
+    },
+    validationSchema: Yup.object({
+      comment: Yup.string().required(),
+    }),
+    onSubmit: async (value) => {
+      try {
+        let editUsers = {
+          text: value.comment,
+          userId: authSelector.id,
+          email: value.email,
+          postId: postId,
+          avatarUrl: value.avatarUrl,
+        };
+        await axiosInstance.patch("/users", editUsers);
+        // formik.setFieldValue("comment", "");
+        fetchComments();
+      } catch (err) {
+        console.log(err);
+      }
+    },
+  });
+
+  const fetchPosts = async () => {
+    try {
+      const response = await axiosInstance.get("/posts", {
+        params: {
+          userId: authSelector.id,
+        },
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const renderPosts = () => {
+    return posts.map((val) => {
+      return (
+        <Post
+          key={val.id.toString()}
+          username={val.user.username}
+          body={val.body}
+          imageUrl={val.image_url}
+          userId={val.userId}
+          onDelete={() => deleteBtnHandler(val.id)}
+          postId={val.id}
+        />
+      )
+    })
+  }
 
   return (
     <Container
@@ -31,7 +103,11 @@ const MyProfile = () => {
       </Text>
       <HStack pt="8">
         <Box>
-          <Avatar size="3xl" name="Segun Adebayo" src={authSelector.avatarUrl} />
+          <Avatar
+            size="3xl"
+            name="Segun Adebayo"
+            src={authSelector.avatarUrl}
+          />
         </Box>
         <Box pl="100">
           <Text fontSize={"2xl"} fontWeight={"semibold"}>
@@ -52,8 +128,41 @@ const MyProfile = () => {
           <br />
           <Text fontSize={"sm"}>{authSelector.role}</Text>
           <br />
+          {editMode ? null : (
+            <>
+              <HStack spacing="6">
+                <Stack>
+                  <FormControl>
+                    <FormLabel>Username</FormLabel>
+                    <Input defaultValue={authSelector.username} />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel>Email</FormLabel>
+                    <Input defaultValue={authSelector.email} />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel>Profile Picture</FormLabel>
+                    <Input defaultValue={authSelector.avatarUrl} />
+                  </FormControl>
+                </Stack>
+              </HStack>
+              <Button mt="8" width="100%" colorScheme="green">
+                Save
+              </Button>
+            </>
+          )}
+
+          <Button
+            mt="8"
+            width="100%"
+            colorScheme="green"
+            onClick={() => openStatusBtnHandler}
+          >
+            Edit Profile
+          </Button>
         </Box>
       </HStack>
+      <Stack>{renderPosts}</Stack>
     </Container>
   );
 };

@@ -85,6 +85,18 @@
       "image_url": "https://images.unsplash.com/photo-1522051311534-1f53d56b49df?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MjB8fHRleHQlMjB0byUyMHNwZWVjaHxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
       "userId": 2,
       "id": 10
+    },
+    {
+      "body": "Sedih bois",
+      "image_url": "https://cdn-image.hipwee.com/wp-content/uploads/2016/12/hipwee-pexels-photo-14303-750x422.jpeg",
+      "userId": 1,
+      "id": 11
+    },
+    {
+      "body": "sendiri aje",
+      "image_url": "https://cdn.idntimes.com/content-images/community/2018/12/1000x666-0-0-1000-666-6dbeffa093bb161568973f5a1125579cf32dba0a-be1f01c624159d816c6cb9bb50ad7af4_600x400.jpg",
+      "userId": 1,
+      "id": 12
     }
   ],
   "comments": [
@@ -105,6 +117,12 @@
       "userId": 3,
       "postId": 10,
       "id": 3
+    },
+    {
+      "text": "Mari kita bergoyang",
+      "userId": 1,
+      "postId": 10,
+      "id": 4
     }
   ]
 }

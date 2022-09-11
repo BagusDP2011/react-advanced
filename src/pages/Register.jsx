@@ -22,6 +22,7 @@ const RegisterPage = () => {
       username: "",
       email: "",
       password: "",
+      avatarUrl: "",
     },
     onSubmit: async (values) => {
       try {
@@ -54,6 +55,7 @@ const RegisterPage = () => {
           email: values.email,
           password: values.password,
           role: "user",
+          avatarUrl: "",
         }
 
         await axiosInstance.post("/users", newUser)
