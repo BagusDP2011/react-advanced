@@ -1,11 +1,10 @@
-import { Box, Container, Text, HStack, WrapItem, useToast, Stack } from "@chakra-ui/react";
-import { Avatar, AvatarBadge, AvatarGroup } from "@chakra-ui/react";
+import { Box, Container, Text, HStack, useToast, Stack } from "@chakra-ui/react";
+import { Avatar } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Navigate, useParams } from "react-router-dom";
 import { axiosInstance } from "../api";
 import Post from "../components/Post";
-import MyProfile from "./MyProfile";
 
 const ProfilePage = () => {
   const authSelector = useSelector((state) => state.auth);
@@ -34,6 +33,7 @@ const ProfilePage = () => {
           userId: user.id,
         },
       });
+      setPosts(response.data)
     } catch (err) {
       console.log(err);
     }
@@ -48,6 +48,17 @@ const ProfilePage = () => {
       fetchPosts();
     }
   }, [user.id]);
+
+
+  const deleteBtnHandler = async (id) => {
+    try {
+      await axiosInstance.delete(`/posts/${id}`)
+      fetchPosts()
+      toast({ title: "Post deleted", status: "info" })
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
   const renderPosts = () => {
     return posts.map((val) => {
@@ -66,7 +77,7 @@ const ProfilePage = () => {
   }
 
   if (params.username === authSelector.username) {
-    return <Navigate to="/MyProfile" />;
+    return <Navigate replace to="/MyProfile" />;
   }
 
   return (
@@ -108,7 +119,7 @@ const ProfilePage = () => {
           <br />
         </Box>
       </HStack>
-      <Stack>{renderPosts}</Stack>
+      <Stack>{renderPosts()}</Stack>
     </Container>
   );
 };

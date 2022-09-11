@@ -22,15 +22,9 @@ import * as Yup from "yup";
 const MyProfile = () => {
   const authSelector = useSelector((state) => state.auth);
   const [openStatus, setOpenStatus] = useState(false);
-  const params = useParams()
-  const [editMode, setEditMode] = useState(false)
-  const [posts, setPosts] = useState()
-  const toast = useToast()
-
-
-  const openStatusBtnHandler = () => {
-    openStatus = !openStatus;
-  };
+  const [editMode, setEditMode] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const toast = useToast();
 
   const formik = useFormik({
     initialValues: {
@@ -43,16 +37,45 @@ const MyProfile = () => {
     }),
     onSubmit: async (value) => {
       try {
+        const emailResponse = await axiosInstance.get("/users", {
+          params: {
+            email: value.email,
+          },
+        });
+
+        if (emailResponse.data.length && value.email !== authSelector.email) {
+          toast({ title: "Email has already been used", status: "error" });
+          return;
+        }
+
+        const usernameResponse = await axiosInstance.get("/users", {
+          params: {
+            username: value.username,
+          },
+        });
+
+        if (
+          usernameResponse.data.length &&
+          value.username !== authSelector.username
+        ) {
+          toast({ title: "Username has already been used", status: "error" });
+          return;
+        }
+
         let editUsers = {
           text: value.comment,
-          userId: authSelector.id,
           email: value.email,
-          postId: postId,
           avatarUrl: value.avatarUrl,
         };
-        await axiosInstance.patch("/users", editUsers);
-        // formik.setFieldValue("comment", "");
-        fetchComments();
+        await axiosInstance.patch(`/users/${authSelector.id}`, editUsers);
+
+        const userResponse = await axiosInstance.get(
+          `/users/${authSelector.id}`
+        );
+
+        dispatch(login(userResponse.data));
+        setEditMode(false);
+        toast({ title: "Profile edited" });
       } catch (err) {
         console.log(err);
       }
@@ -66,6 +89,7 @@ const MyProfile = () => {
           userId: authSelector.id,
         },
       });
+      setPosts(response.data);
     } catch (err) {
       console.log(err);
     }
@@ -83,9 +107,13 @@ const MyProfile = () => {
           onDelete={() => deleteBtnHandler(val.id)}
           postId={val.id}
         />
-      )
-    })
-  }
+      );
+    });
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
   return (
     <Container
@@ -105,10 +133,11 @@ const MyProfile = () => {
         <Box>
           <Avatar
             size="3xl"
-            name="Segun Adebayo"
+            name={authSelector.username}
             src={authSelector.avatarUrl}
           />
         </Box>
+        { !openStatus ? (
         <Box pl="100">
           <Text fontSize={"2xl"} fontWeight={"semibold"}>
             Username:
@@ -128,8 +157,9 @@ const MyProfile = () => {
           <br />
           <Text fontSize={"sm"}>{authSelector.role}</Text>
           <br />
-          {editMode ? null : (
-            <>
+          </Box>
+          ) : (
+            <Box>
               <HStack spacing="6">
                 <Stack>
                   <FormControl>
@@ -149,9 +179,9 @@ const MyProfile = () => {
               <Button mt="8" width="100%" colorScheme="green">
                 Save
               </Button>
-            </>
+              </Box>
           )}
-
+          <Box>
           <Button
             mt="8"
             width="100%"

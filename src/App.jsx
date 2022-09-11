@@ -18,8 +18,6 @@ import { login, logout } from "./redux/features/authSlice"
 
 const App = () => {
   const [authCheck, setAuthCheck] = useState(false)
-  const [isiUser, setUser] = useState({})
-  const params = useParams()
   const authSelector = useSelector((state) => state.auth)
   const dispatch = useDispatch()
 
