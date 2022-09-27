@@ -23,16 +23,17 @@ const App = () => {
 
   const keepUserLoggedIn = async () => {
     try {
-      const auth_id = localStorage.getItem("auth_data")
+      const auth_id = localStorage.getItem("auth_token")
       
       if (!auth_id) {
         setAuthCheck(true)
         return
       }
       
-      const response = await axiosInstance.get(`/users/${auth_id}`)
+      const response = await axiosInstance.get(`/auth/refresh-token`)
 
-      dispatch(login(response.data))
+      dispatch(login(response.data.data))
+      localStorage.setItem("auth_token", response.data.token)
       setAuthCheck(true)
 
     } catch (err) {
@@ -44,7 +45,7 @@ const App = () => {
 
 
   const logoutBtnHandler = () => {
-    localStorage.removeItem("auth_data")
+    localStorage.removeItem("auth_token")
     dispatch(logout())
   }
 
@@ -76,20 +77,21 @@ const App = () => {
           <Text fontSize="4xl" fontWeight="bold">
             Hello {authSelector.username}
           </Text>
-          <List>
-            <ListItem>
+          <HStack spacing={"10"}>
+          <Box>
               <Link to="/">Home</Link>
-            </ListItem>
-            <ListItem>
+            </Box>
+            <Box>
               <Link to="/profile">Profile</Link>
-            </ListItem>
-            <ListItem>
+            </Box>
+            <Box>
               <Link to="/login">Login</Link>
-            </ListItem>
-            <ListItem>
+            </Box>
+            <Box>
               <Link to="/register">Register</Link>
-            </ListItem>
-          </List>
+            </Box>
+          
+          </HStack>
           <Box>
             <Button onClick={logoutBtnHandler} colorScheme="red">
               Logout

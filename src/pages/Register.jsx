@@ -26,46 +26,23 @@ const RegisterPage = () => {
     },
     onSubmit: async (values) => {
       try {
-        // 1. Email unique
-        // 2. Username unique
-        const emailResponse = await axiosInstance.get("/users", {
-          params: {
-            email: values.email,
-          },
-        })
-
-        if (emailResponse.data.length) {
-          toast({ title: "Email has already been used", status: "error" })
-          return
-        }
-
-        const usernameResponse = await axiosInstance.get("/users", {
-          params: {
-            username: values.username,
-          },
-        })
-
-        if (usernameResponse.data.length) {
-          toast({ title: "Username has already been used", status: "error" })
-          return
-        }
-
-        let newUser = {
+        const response = await axiosInstance.post("/auth/register", {
           username: values.username,
           email: values.email,
-          password: values.password,
-          role: "user",
-          avatarUrl: "",
-        }
-
-        await axiosInstance.post("/users", newUser)
-
+          password: values.password
+        })
         toast({
-          title: "Registration successful",
+          title: "Registration Successfully",
           status: "success",
+          description: response.data.message        
         })
       } catch (err) {
         console.log(err)
+        toast({
+          title: "Registration failed miserably",
+          status: "error",
+          description: err.response.data.message
+        })
       }
     },
     validationSchema: Yup.object({
@@ -138,3 +115,44 @@ const RegisterPage = () => {
 
 export default RegisterPage
 
+
+
+// isi onsubmit
+//// 1. Email unique
+        // 2. Username unique
+        // const emailResponse = await axiosInstance.get("/users", {
+        //   params: {
+        //     email: values.email,
+        //   },
+        // })
+
+        // if (emailResponse.data.length) {
+        //   toast({ title: "Email has already been used", status: "error" })
+        //   return
+        // }
+
+        // const usernameResponse = await axiosInstance.get("/users", {
+        //   params: {
+        //     username: values.username,
+        //   },
+        // })
+
+        // if (usernameResponse.data.length) {
+        //   toast({ title: "Username has already been used", status: "error" })
+        //   return
+        // }
+
+        // let newUser = {
+        //   username: values.username,
+        //   email: values.email,
+        //   password: values.password,
+        //   role: "user",
+        //   avatarUrl: "",
+        // }
+
+        // await axiosInstance.post("/users", newUser)
+
+        // toast({
+        //   title: "Registration successful",
+        //   status: "success",
+        // })
