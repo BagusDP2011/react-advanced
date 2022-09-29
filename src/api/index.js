@@ -25,6 +25,7 @@ axiosInstance.interceptors.response.use(
     localStorage.removeItem("auth_token")
     store.dispatch(logout())
   }
+  return Promise.reject(resError)
 }
 
 )

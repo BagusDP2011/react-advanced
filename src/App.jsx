@@ -77,7 +77,7 @@ const App = () => {
           <Text fontSize="4xl" fontWeight="bold">
             Hello {authSelector.username}
           </Text>
-          <HStack spacing={"10"}>
+          <HStack spacing={"100"}>
           <Box>
               <Link to="/">Home</Link>
             </Box>

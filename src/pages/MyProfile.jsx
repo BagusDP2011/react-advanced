@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { axiosInstance } from "../api";
 import * as Yup from "yup";
+import axios from "axios";
 
 const MyProfile = () => {
   const authSelector = useSelector((state) => state.auth);
@@ -28,56 +29,82 @@ const MyProfile = () => {
 
   const formik = useFormik({
     initialValues: {
-      username: authSelector.username,
-      email: authSelector.email,
-      avatarUrl: authSelector.avatarUrl,
+      username: "",
+      email: "",
+      profile_picture: null,
+      // avatarUrl: authSelector.avatarUrl,
+      // username: authSelector.username,
+      // email: authSelector.email,
+      // avatarUrl: authSelector.avatarUrl,
+      
     },
-    validationSchema: Yup.object({
-      comment: Yup.string().required(),
-    }),
+    // validationSchema: Yup.object({
+    //   comment: Yup.string().required(),
+    // }),
     onSubmit: async (value) => {
       try {
-        const emailResponse = await axiosInstance.get("/users", {
-          params: {
-            email: value.email,
-          },
-        });
-
-        if (emailResponse.data.length && value.email !== authSelector.email) {
-          toast({ title: "Email has already been used", status: "error" });
-          return;
+        const userData = new FormData()
+        
+        if (username && username !== authSelector.username){
+          userData.append("username", username)
         }
-
-        const usernameResponse = await axiosInstance.get("/users", {
-          params: {
-            username: value.username,
-          },
-        });
-
-        if (
-          usernameResponse.data.length &&
-          value.username !== authSelector.username
-        ) {
-          toast({ title: "Username has already been used", status: "error" });
-          return;
+        if (email && email !== authSelector.email){
+          userData.append("email", email)
         }
-
-        let editUsers = {
-          text: value.comment,
-          email: value.email,
-          avatarUrl: value.avatarUrl,
-        };
-        await axiosInstance.patch(`/users/${authSelector.id}`, editUsers);
-
-        const userResponse = await axiosInstance.get(
-          `/users/${authSelector.id}`
-        );
-
-        dispatch(login(userResponse.data));
+        if (profile_picture) {
+          userData.append("profile_picture", profile_picture)
+        }
+        const userResponse = await axiosInstance.patch("auth/me", userData)
+        dispatch(login(userResponse.data.data));
         setEditMode(false);
         toast({ title: "Profile edited" });
+    
+        // const emailResponse = await axiosInstance.get("/users", {
+        //   params: {
+        //     email: value.email,
+        //   },
+        // });
+
+        // if (emailResponse.data.length && value.email !== authSelector.email) {
+        //   toast({ title: "Email has already been used", status: "error" });
+        //   return;
+        // }
+
+        // const usernameResponse = await axiosInstance.get("/users", {
+        //   params: {
+        //     username: value.username,
+        //   },
+        // });
+
+        // if (
+        //   usernameResponse.data.length &&
+        //   value.username !== authSelector.username
+        // ) {
+        //   toast({ title: "Username has already been used", status: "error" });
+        //   return;
+        // }
+
+        // let editUsers = {
+        //   text: value.comment,
+        //   email: value.email,
+        //   avatarUrl: value.avatarUrl,
+        // };
+        // await axiosInstance.patch(`/users/${authSelector.id}`, editUsers);
+
+        // const userResponse = await axiosInstance.get(
+        //   `/users/${authSelector.id}`
+        // );
+
+        // dispatch(login(userResponse.data));
+        // setEditMode(false);
+        // toast({ title: "Profile edited" });
       } catch (err) {
-        console.log(err);
+        console.log(err)
+        toast({
+          title: "Failed edit",
+          status: "error",
+          description: err.response.data.message,
+        })
       }
     },
   });
@@ -172,7 +199,12 @@ const MyProfile = () => {
                   </FormControl>
                   <FormControl>
                     <FormLabel>Profile Picture</FormLabel>
-                    <Input defaultValue={authSelector.avatarUrl} />
+                    <Input 
+                    accept="image/*"
+                    type="file"
+                    onChange={(event) => formik.setFieldValue("profile_picture", event.target.files[0])}
+                    defaultValue={authSelector.avatarUrl} 
+                    />
                   </FormControl>
                 </Stack>
               </HStack>

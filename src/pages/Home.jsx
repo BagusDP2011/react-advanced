@@ -14,7 +14,7 @@ import {
   AlertTitle,
 } from "@chakra-ui/react"
 import { useFormik } from "formik"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useSelector } from "react-redux"
 import { axiosInstance } from "../api"
 import Post from "../components/Post"
@@ -28,23 +28,26 @@ const HomePage = () => {
 
   const toast = useToast()
 
+  const inputFileRef = useRef(null)
+
   const formik = useFormik({
     initialValues: {
       body: "",
-      image_url: "",
+      post_image: null,
     },
     onSubmit: async (values) => {
       try {
-        let newPost = {
-          body: values.body,
-          image_url: values.image_url,
-          userId: authSelector.id,
-        }
+        localStorage.getItem("auth_token")
+        
+        let newPost = new FormData()
 
-        await axiosInstance.post("/posts", newPost)
+        newPost.append("body", values.body)
+        newPost.append("post_image", values.post_image)
+
+        await axiosInstance.post("/post", newPost)
 
         formik.setFieldValue("body", "")
-        formik.setFieldValue("image_url", "")
+        formik.setFieldValue("post_image", null)
 
         toast({
           position: "top-right",
@@ -67,23 +70,24 @@ const HomePage = () => {
 
   const fetchPosts = async () => {
     try {
-      const response = await axiosInstance.get("/posts", {
+      const response = await axiosInstance.get("/post"
+      , {
         params: {
-          _expand: "user",
-          _sort: "id",
-          _order: "desc",
           _limit: 2,
           _page: page,
+          _sortDir: "DESC",
         },
       })
 
-      setTotalCount(response.headers["x-total-count"])
 
-      if (page === 1) {
-        setPosts(response.data)
-      } else {
-        setPosts([...posts, ...response.data])
-      }
+        setTotalCount(response.data.dataCount)
+        if (page === 1) {
+          setPosts(response.data.data)
+        } else {
+          setPosts([...posts, ...response.data.data])
+        }
+        console.log(setPosts())
+        console.log(posts)
     } catch (err) {
       console.log(err)
     }
@@ -105,16 +109,17 @@ const HomePage = () => {
       return (
         <Post
           key={val.id.toString()}
-          username={val.user.username}
+          username={val.User.username}
           body={val.body}
           imageUrl={val.image_url}
-          userId={val.userId}
+          userId={val.UserId}
           onDelete={() => deleteBtnHandler(val.id)}
           postId={val.id}
         />
       )
     })
   }
+  
 
   const seeMoreBtnHandler = () => {
     setPage(page + 1)
@@ -137,11 +142,21 @@ const HomePage = () => {
           />
           <HStack>
             <Input
-              value={formik.values.image_url}
-              onChange={inputChangeHandler}
-              name="image_url"
-              placeholder="Insert image URL"
+              // value={formik.values.post_image}
+              ref={inputFileRef}
+              display="none"
+              name="post_image"
+              type="file"
+              accept="image/*"
+              onChange={(event) => {
+                formik.setFieldValue("post_image", event.target.files[0])
+              }}
             />
+            <Button width="100%"
+            onClick={() => {
+              inputFileRef.current.click()
+            }}
+            >{formik?.values?.post_image?.name || "Upload Image"}</Button>
             <Button
               onClick={formik.handleSubmit}
               isDisabled={formik.isSubmitting}

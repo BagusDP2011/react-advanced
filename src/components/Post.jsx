@@ -48,7 +48,7 @@ const Post = ({ username, body, imageUrl, userId, onDelete, postId }) => {
           _expand: "user",
         },
       });
-      setComments(response.data)
+      setComments(response.data.data)
     } catch (err) {
       console.log(err);
     }
@@ -80,7 +80,7 @@ const Post = ({ username, body, imageUrl, userId, onDelete, postId }) => {
         };
         await axiosInstance.post("/comments", newComment);
         formik.setFieldValue("comment", "");
-        fetchComments();
+        // fetchComments();
       } catch (err) {
         console.log(err);
       }
@@ -135,7 +135,7 @@ const Post = ({ username, body, imageUrl, userId, onDelete, postId }) => {
           Comments
         </Text>
         <Stack mt="2" spacing={"0.5"}>
-          {renderComments()}
+          {/* {renderComments()} */}
         </Stack>
         <form onSubmit={formik.handleSubmit}>
           <HStack mt="3">
