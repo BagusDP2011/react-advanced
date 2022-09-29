@@ -37,7 +37,7 @@ const HomePage = () => {
     },
     onSubmit: async (values) => {
       try {
-        localStorage.getItem("auth_token")
+        // localStorage.getItem("auth_token")
         
         let newPost = new FormData()
 
@@ -54,10 +54,16 @@ const HomePage = () => {
           title: "Post uploaded",
           status: "success",
         })
-
+        
         fetchPosts()
       } catch (err) {
         console.log(err)
+        toast({
+          position: "top-right",
+          title: "Post failed",
+          status: "error",
+        })
+
       }
     },
   })
@@ -77,17 +83,18 @@ const HomePage = () => {
           _page: page,
           _sortDir: "DESC",
         },
-      })
+      }
+      )
 
-
-        setTotalCount(response.data.dataCount)
+      setTotalCount(response.data.dataCount)
+      // console.log(response.data)
         if (page === 1) {
           setPosts(response.data.data)
         } else {
           setPosts([...posts, ...response.data.data])
         }
-        console.log(setPosts())
-        console.log(posts)
+        // console.log(setPosts(response.data.data))
+        // console.log(posts)
     } catch (err) {
       console.log(err)
     }
