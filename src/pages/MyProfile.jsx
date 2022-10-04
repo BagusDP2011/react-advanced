@@ -19,10 +19,10 @@ import { useParams } from "react-router-dom";
 import { axiosInstance } from "../api";
 import * as Yup from "yup";
 import axios from "axios";
+import Post from "../components/Post";
 
 const MyProfile = () => {
   const authSelector = useSelector((state) => state.auth);
-  const [openStatus, setOpenStatus] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [posts, setPosts] = useState([]);
   const toast = useToast();
@@ -36,29 +36,31 @@ const MyProfile = () => {
       // username: authSelector.username,
       // email: authSelector.email,
       // avatarUrl: authSelector.avatarUrl,
-      
     },
     // validationSchema: Yup.object({
     //   comment: Yup.string().required(),
     // }),
     onSubmit: async (value) => {
       try {
-        const userData = new FormData()
-        
-        if (username && username !== authSelector.username){
-          userData.append("username", username)
+        const userData = new FormData();
+
+        if (username && username !== authSelector.username) {
+          userData.append("username", username);
         }
-        if (email && email !== authSelector.email){
-          userData.append("email", email)
+        if (email && email !== authSelector.email) {
+          userData.append("email", email);
         }
         if (profile_picture) {
-          userData.append("profile_picture", profile_picture)
+          userData.append("profile_picture", profile_picture);
         }
-        const userResponse = await axiosInstance.patch("auth/me", userData)
+        const userResponse = await axiosInstance.patch("auth/me", userData);
         dispatch(login(userResponse.data.data));
         setEditMode(false);
-        toast({ title: "Profile edited" });
-    
+        toast({ 
+          title: "Profile edited", 
+          status: "info",
+        });
+
         // const emailResponse = await axiosInstance.get("/users", {
         //   params: {
         //     email: value.email,
@@ -99,26 +101,49 @@ const MyProfile = () => {
         // setEditMode(false);
         // toast({ title: "Profile edited" });
       } catch (err) {
-        console.log(err)
+        console.log(err);
         toast({
           title: "Failed edit",
           status: "error",
           description: err.response.data.message,
-        })
+        });
       }
     },
   });
 
   const fetchPosts = async () => {
     try {
-      const response = await axiosInstance.get("/posts", {
-        params: {
-          userId: authSelector.id,
-        },
-      });
-      setPosts(response.data);
+      const response = await axiosInstance.get(
+        "/post/MyProfile"
+        // , {
+        //   params: {
+        //     userId: authSelector.id,
+        //     // _expand: "user",
+        //   },
+        // }
+      );
+      setPosts(response.data.data);
     } catch (err) {
       console.log(err);
+      toast({ 
+        title: "Server Error: Failed to fetch", 
+        status: "error",
+      });
+    }
+  };
+
+  const deleteBtnHandler = async (id) => {
+    try {
+      await axiosInstance.delete(`/posts/${id}`);
+
+      fetchPosts();
+      toast({ title: "Post deleted", status: "info" });
+    } catch (err) {
+      console.log(err);
+      toast({ 
+        title: "Failed to delete", 
+        status: "error",
+      });
     }
   };
 
@@ -127,15 +152,21 @@ const MyProfile = () => {
       return (
         <Post
           key={val.id.toString()}
-          username={val.user.username}
+          username={val.User.username}
           body={val.body}
           imageUrl={val.image_url}
-          userId={val.userId}
+          userId={val.UserId}
           onDelete={() => deleteBtnHandler(val.id)}
           postId={val.id}
         />
       );
     });
+  };
+
+  const formChangeHandler = ({ target }) => {
+    const { name, value } = target;
+
+    formik.setFieldValue(name, value);
   };
 
   useEffect(() => {
@@ -164,67 +195,91 @@ const MyProfile = () => {
             src={authSelector.avatarUrl}
           />
         </Box>
-        { !openStatus ? (
-        <Box pl="100">
-          <Text fontSize={"2xl"} fontWeight={"semibold"}>
-            Username:
-          </Text>
-          <br />
-          <Text fontSize={"sm"}>{authSelector.username}</Text>
-          <br />
-          <Text fontSize={"2xl"} fontWeight={"semibold"}>
-            Email:
-          </Text>
-          <br />
-          <Text fontSize={"sm"}>{authSelector.email}</Text>
-          <br />
-          <Text fontSize={"2xl"} fontWeight={"semibold"}>
-            Role:
-          </Text>
-          <br />
-          <Text fontSize={"sm"}>{authSelector.role}</Text>
-          <br />
+        {!editMode ? (
+          <Box pl="100">
+            <Text fontSize={"2xl"} fontWeight={"semibold"}>
+              Username:
+            </Text>
+            <br />
+            <Text fontSize={"sm"}>{authSelector.username}</Text>
+            <br />
+            <Text fontSize={"2xl"} fontWeight={"semibold"}>
+              Email:
+            </Text>
+            <br />
+            <Text fontSize={"sm"}>{authSelector.email}</Text>
+            <br />
+            <Text fontSize={"2xl"} fontWeight={"semibold"}>
+              Role:
+            </Text>
+            <br />
+            <Text fontSize={"sm"}>{authSelector.role}</Text>
+            <br />
           </Box>
-          ) : (
-            <Box>
-              <HStack spacing="6">
-                <Stack>
-                  <FormControl>
-                    <FormLabel>Username</FormLabel>
-                    <Input defaultValue={authSelector.username} />
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel>Email</FormLabel>
-                    <Input defaultValue={authSelector.email} />
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel>Profile Picture</FormLabel>
-                    <Input 
+        ) : (
+          <Box>
+            <HStack spacing="6">
+              <Stack>
+                <FormControl>
+                  <FormLabel>Username</FormLabel>
+                  <Input
+                    defaultValue={authSelector.username}
+                    onChange={formChangeHandler}
+                    name="username"
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Email</FormLabel>
+                  <Input
+                    defaultValue={authSelector.email}
+                    onChange={formChangeHandler}
+                    name="email"
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Profile Picture</FormLabel>
+                  <Input
                     accept="image/*"
                     type="file"
-                    onChange={(event) => formik.setFieldValue("profile_picture", event.target.files[0])}
-                    defaultValue={authSelector.avatarUrl} 
-                    />
-                  </FormControl>
-                </Stack>
-              </HStack>
-              <Button mt="8" width="100%" colorScheme="green">
-                Save
-              </Button>
-              </Box>
-          )}
+                    onChange={(event) =>
+                      formik.setFieldValue(
+                        "profile_picture",
+                        event.target.files[0]
+                      )
+                    }
+                    name="profile_picture"
+                  />
+                </FormControl>
+              </Stack>
+            </HStack>
+          </Box>
+        )}
+
+        {editMode ? (
           <Box>
-          <Button
-            mt="8"
-            width="100%"
-            colorScheme="green"
-            onClick={() => openStatusBtnHandler}
-          >
-            Edit Profile
-          </Button>
-        </Box>
+            <Button
+              mt="8"
+              width="100%"
+              colorScheme="green"
+              onClick={formik.handleSubmit}
+            >
+              Save
+            </Button>
+          </Box>
+        ) : (
+          <Box>
+            <Button
+              mt="8"
+              width="100%"
+              colorScheme="green"
+              onClick={() => setEditMode(true)}
+            >
+              Edit Profile
+            </Button>
+          </Box>
+        )}
       </HStack>
-      <Stack>{renderPosts}</Stack>
+      <Stack>{renderPosts()}</Stack>
     </Container>
   );
 };
