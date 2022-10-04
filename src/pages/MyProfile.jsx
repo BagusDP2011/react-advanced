@@ -14,18 +14,22 @@ import {
 import { Avatar, AvatarBadge, AvatarGroup } from "@chakra-ui/react";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { axiosInstance } from "../api";
 import * as Yup from "yup";
 import axios from "axios";
 import Post from "../components/Post";
+import { login } from "../redux/features/authSlice.js"
+
 
 const MyProfile = () => {
   const authSelector = useSelector((state) => state.auth);
   const [editMode, setEditMode] = useState(false);
   const [posts, setPosts] = useState([]);
   const toast = useToast();
+  const dispatch = useDispatch()
+
 
   const formik = useFormik({
     initialValues: {
@@ -40,7 +44,7 @@ const MyProfile = () => {
     // validationSchema: Yup.object({
     //   comment: Yup.string().required(),
     // }),
-    onSubmit: async (value) => {
+    onSubmit: async ({ username, email, profile_picture }) => {
       try {
         const userData = new FormData();
 
@@ -54,7 +58,9 @@ const MyProfile = () => {
           userData.append("profile_picture", profile_picture);
         }
         const userResponse = await axiosInstance.patch("auth/me", userData);
+
         dispatch(login(userResponse.data.data));
+        console.log(userResponse.data.data)
         setEditMode(false);
         toast({ 
           title: "Profile edited", 
@@ -192,7 +198,7 @@ const MyProfile = () => {
           <Avatar
             size="3xl"
             name={authSelector.username}
-            src={authSelector.avatarUrl}
+            src={authSelector.profile_picture_url}
           />
         </Box>
         {!editMode ? (
